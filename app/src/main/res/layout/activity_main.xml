@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:background="#29292F">
+
+    <TextView
+        android:id="@+id/link"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:text="连接服务器"
+        android:textColor="#ffffff"
+        android:textSize="20sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/link"
+        app:layout_constraintBottom_toBottomOf="@id/link"
+        app:layout_constraintRight_toRightOf="parent"
+        android:textSize="18sp"
+        android:textColor="#F4F200"
+        android:id="@+id/log"
+        android:layout_marginEnd="16dp"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LED灯测试"
+        android:textColor="#ffffff"
+        android:textSize="20sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/link"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:id="@+id/ledtest"
+        />
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/sledtest"
+        android:layout_marginLeft="16dp"
+        app:layout_constraintTop_toTopOf="@id/ledtest"
+        app:layout_constraintBottom_toBottomOf="@id/ledtest"
+        app:layout_constraintLeft_toRightOf="@id/ledtest"
+        />
+
+    <Switch
+        android:id="@+id/slink"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        app:layout_constraintBottom_toBottomOf="@id/link"
+        app:layout_constraintLeft_toRightOf="@id/link"
+        app:layout_constraintTop_toTopOf="@id/link"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="AD采样开关"
+        android:textColor="#ffffff"
+        android:textSize="20sp"
+        android:id="@+id/adkit"
+        app:layout_constraintBottom_toBottomOf="@id/ledtest"
+        app:layout_constraintTop_toTopOf="@id/ledtest"
+        app:layout_constraintRight_toLeftOf="@id/sadkit"
+        android:layout_marginRight="16dp"
+        />
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/ledtest"
+        app:layout_constraintBottom_toBottomOf="@id/ledtest"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginRight="16dp"
+        android:id="@+id/sadkit"
+        android:checked="true"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textColor="#ffffff"
+        android:text="校准温度"
+        android:layout_marginStart="16dp"
+        app:layout_constraintTop_toBottomOf="@id/ledtest"
+        android:layout_marginTop="16dp"
+        android:id="@+id/check"
+        app:layout_constraintLeft_toLeftOf="parent"
+        />
+
+    <EditText
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/check"
+        app:layout_constraintBottom_toBottomOf="@id/check"
+        app:layout_constraintLeft_toRightOf="@id/check"
+        app:layout_constraintRight_toLeftOf="@id/bcheck"
+        android:textColor="#ffffff"
+        android:textSize="20sp"
+        android:id="@+id/echeck"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:textSize="20sp"
+        android:textColor="#ffffff"
+        android:text="校准"
+        android:background="@drawable/circle_button"
+        app:layout_constraintLeft_toRightOf="@id/echeck"
+        app:layout_constraintTop_toTopOf="@id/echeck"
+        app:layout_constraintBottom_toBottomOf="@id/echeck"
+        app:layout_constraintRight_toRightOf="parent"
+        android:id="@+id/bcheck"
+        android:layout_marginEnd="16dp"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+        android:textSize="20sp"
+        android:text="桥臂电阻"
+        android:layout_marginStart="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/check"
+        android:layout_marginTop="16dp"
+        android:id="@+id/restriction"
+        />
+
+    <EditText
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textColor="#ffffff"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintLeft_toRightOf="@id/restriction"
+        app:layout_constraintBottom_toBottomOf="@id/restriction"
+        app:layout_constraintTop_toTopOf="@id/restriction"
+        app:layout_constraintRight_toLeftOf="@id/brestriction"
+        android:id="@+id/erestriction"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:background="@drawable/circle_button"
+        android:textColor="#ffffff"
+        android:textSize="20sp"
+        android:text="校准"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintLeft_toRightOf="@id/erestriction"
+        app:layout_constraintTop_toTopOf="@id/erestriction"
+        app:layout_constraintBottom_toBottomOf="@id/erestriction"
+        app:layout_constraintRight_toRightOf="parent"
+        android:id="@+id/brestriction"
+        />
+
+    <com.example.singlechipcontrol2.CircleProgress
+        android:id="@+id/circle_progress"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="32dp"
+        app:antiAlias="true"
+        app:arcWidth="15dp"
+        app:bgArcColor="@android:color/darker_gray"
+        app:bgArcWidth="2dp"
+        app:dottedLineWidth="12dp"
+        app:foreEndColor="#F4F200"
+        app:foreStartColor="#FE6615"
+        app:hintSize="15dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/erestriction"
+        app:maxValue="60"
+        app:startAngle="135"
+        app:sweepAngle="270"
+        app:textOffsetPercentInRadius="0.5"
+        app:unit="当前温度(°C)"
+        app:unitColor="@android:color/darker_gray"
+        app:unitSize="15dp"
+        app:value="0"
+        app:valueColor="#FFCC1E"
+        app:valueSize="80dp" />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
