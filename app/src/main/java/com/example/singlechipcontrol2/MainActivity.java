@@ -1,7 +1,10 @@
 package com.example.singlechipcontrol2;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -13,17 +16,21 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.LineChart;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+
 
 public class MainActivity extends AppCompatActivity {
 
     CircleProgress circleProgress;
     TextView log;
-    Switch link,ledtest,adkit;
-    EditText echeck,erestriction;
+    Switch link,ledtest,adkit,templimit;
+    EditText echeck,erestriction,uplimit,downlimit;
     Button bcheck,brestriction;
+    LineChart lineChart;
 
     Socket socket;
     MyHandler myHandler;
@@ -39,6 +46,10 @@ public class MainActivity extends AppCompatActivity {
     double diff = 0;
     double degree = 0;
     double restrictioncheck = 100;
+
+    int up = 30,down = 20;
+
+    private DynamicLineChartManager dynamicLineChartManager1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,16 +67,27 @@ public class MainActivity extends AppCompatActivity {
         bcheck = findViewById(R.id.bcheck);
         erestriction = findViewById(R.id.erestriction);
         brestriction = findViewById(R.id.brestriction);
+        lineChart = findViewById(R.id.lineChart);
+        templimit = findViewById(R.id.stemplimit);
+        uplimit = findViewById(R.id.euplimit);
+        downlimit = findViewById(R.id.edownlimit);
         circleProgress.setPrecision(2);
         adkit.setChecked(true);
         link.setChecked(false);
         log.setText("单片机控制程序");
 
+        dynamicLineChartManager1 = new DynamicLineChartManager(lineChart,"温度", 0xFF6FA9E1);
+        dynamicLineChartManager1.setYAxis(60, 0, 10);
+        Drawable drawable = ResourcesCompat.getDrawable(getResources(),R.drawable.fade_blue,null);
+        dynamicLineChartManager1.setChartFillDrawable(drawable);
+        setMarkerView();
+
         link.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                clearfocus();
                 if(isChecked){
-                    log.setText("连接服务器成功");
+                    log.setText("连接单片机成功");
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -91,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     try{ socket.close(); }catch (Exception e){} //关闭
                     try{ inputStream.close(); }catch (Exception e){} //关闭数据流
-                    log.setText("与服务器断开连接");
+                    log.setText("与单片机断开连接");
                 }
             }
         });
@@ -99,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
         ledtest.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                clearfocus();
                 if(isChecked){
                         runflag = 2;
                         log.setText("点亮LED灯");
@@ -114,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
         adkit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                clearfocus();
                 if(isChecked){
                         runflag = 3;
                         log.setText("启动AD采样");
@@ -129,17 +153,59 @@ public class MainActivity extends AppCompatActivity {
         bcheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                clearfocus();
                 double checkdegree = Double.parseDouble(echeck.getText().toString());
                 diff = checkdegree - degree;
+                log.setText("已校准");
             }
         });
 
         brestriction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                clearfocus();
                 restrictioncheck = Double.parseDouble(erestriction.getText().toString());
+                log.setText("已校准");
             }
         });
+
+        templimit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                clearfocus();
+                if (isChecked){
+                    up = Integer.valueOf(uplimit.getText().toString());
+                    down = Integer.valueOf(downlimit.getText().toString());
+
+                    dynamicLineChartManager1.setHightLimitLine(up,"上限",Color.RED);
+                    dynamicLineChartManager1.setHightLimitLine(down,"下限",Color.BLUE);
+
+                    double temp = (up - diff)*0.385 + restrictioncheck;
+                    up = (int)(205000 * (temp/(1000+temp)-restrictioncheck/(restrictioncheck+1000)));
+
+
+                    temp = (down - diff)*0.385 + restrictioncheck;
+                    down = (int)(205000 * (temp/(1000+temp)-restrictioncheck/(restrictioncheck+1000)));
+
+                    runflag = 5;
+                    log.setText("温度报警已打开");
+                    runble(5);
+                }else {
+                    dynamicLineChartManager1.removeLimitLine();
+                    runflag = 6;
+                    log.setText("温度报警已关闭");
+                    runble(6);
+                }
+            }
+        });
+
+    }
+
+    public void setMarkerView() {
+        LineChartMarkView mv = new LineChartMarkView(this, dynamicLineChartManager1.getxAxis().getValueFormatter());
+        mv.setChartView(lineChart);
+        lineChart.setMarker(mv);
+        lineChart.invalidate();
     }
 
     public void TcpClientReceive(){
@@ -161,6 +227,12 @@ public class MainActivity extends AppCompatActivity {
                                 runflag = 1;
                             }else if (runflag==4){
                                 runble(4);
+                                runflag = 1;
+                            }else if (runflag==5){
+                                runble(5);
+                                runflag = 1;
+                            }else if (runflag == 6){
+                                runble(6);
                                 runflag = 1;
                             }
                             byte[] Buffer = new byte[TcpReceiveDataLen];//创建一个新的数组
@@ -192,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             if (msg.what == 1){//接收到消息变量的 what 变量值 为1
-                log.setText("服务器连接成功");//按钮显示断开
+                log.setText("单片机连接成功");//按钮显示断开
             }
             else if (msg.what == 2){//接收到消息变量的 what 变量值为2
                 try{
@@ -217,6 +289,10 @@ public class MainActivity extends AppCompatActivity {
                     double showdegree = degree + diff;
 
                     circleProgress.setValue((float)showdegree);
+
+                    dynamicLineChartManager1.addEntry(showdegree);
+                    Drawable drawable = ResourcesCompat.getDrawable(getResources(),R.drawable.fade_blue,null);
+                    dynamicLineChartManager1.setChartFillDrawable(drawable);
                     //Log.e("MainActivity", new String(TcpReadData) );//打印消息
                 }catch (Exception e){}
 
@@ -224,14 +300,13 @@ public class MainActivity extends AppCompatActivity {
             else if (msg.what == 9){//接收到消息变量的 what 变量值 为9
                 try{ socket.close(); }catch (Exception e){} //关闭连接
                 try{ inputStream.close(); }catch (Exception e){} //关闭连接
-                log.setText("和服务器断开连接");//按钮显示连接
+                log.setText("和单片机断开连接");//按钮显示连接
                 Log.e("Mainactivity","和服务器断开连接");
             }
         }
     }
 
-    public void runble(int flag)
-    {
+    public void runble(int flag) {
         if(flag == 1) {
             new Thread(new Runnable() {
                 @Override
@@ -325,7 +400,76 @@ public class MainActivity extends AppCompatActivity {
                     }catch (Exception  e){}
                 }
             }).start();
+        }else if (runflag == 5){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try{
+                        String s = "LIMITOK" + checkbit(up) + checkbit(down) + up + down;
+                        byte[] TcpSendData2 = s.getBytes();
+                        TcpSendDataLen = TcpSendData2.length;
+                        TcpSendData = TcpSendData2;
+
+                        if (socket!=null && socket.isConnected()){//如果TCP是正常连接的
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try{
+                                        outputStream.write(TcpSendData,0,TcpSendDataLen);//发送数据
+                                    }catch (Exception e){}
+                                }
+                            }).start();
+                        }
+                    }catch (Exception  e){}
+                }
+            }).start();
+        }else if (runflag == 6){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try{
+                        String s = "UNLIMITOK";
+                        byte[] TcpSendData2 = s.getBytes();
+                        TcpSendDataLen = TcpSendData2.length;
+                        TcpSendData = TcpSendData2;
+
+                        if (socket!=null && socket.isConnected()){//如果TCP是正常连接的
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try{
+                                        outputStream.write(TcpSendData,0,TcpSendDataLen);//发送数据
+                                    }catch (Exception e){}
+                                }
+                            }).start();
+                        }
+                    }catch (Exception  e){}
+                }
+            }).start();
         }
 
+    }
+
+    public void clearfocus(){
+        echeck.clearFocus();
+        erestriction.clearFocus();
+        uplimit.clearFocus();
+        downlimit.clearFocus();
+    }
+
+    public int checkbit(int num){
+        int result;
+        if (num >= 0 && num <10){
+            result = 1;
+        }else if (num>=10&&num<100){
+            result = 2;
+        }else if (num>=100&&num<1000){
+            result = 3;
+        }else if (num>=1000&&num<10000){
+            result = 4;
+        }else {
+            result = 0;
+        }
+        return result;
     }
 }

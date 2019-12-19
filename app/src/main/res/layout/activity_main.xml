@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:background="#29292F">
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:focusableInTouchMode="true"
+    android:focusable="true">
 
     <TextView
         android:id="@+id/link"
@@ -13,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="16dp"
-        android:text="连接服务器"
+        android:text="连接单片机"
         android:textColor="#ffffff"
         android:textSize="20sp"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -200,6 +206,110 @@
         app:valueColor="#FFCC1E"
         app:valueSize="80dp" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textColor="#ffffff"
+        android:text="温度曲线"
+        app:layout_constraintTop_toBottomOf="@id/circle_progress"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginStart="16dp"
+        android:id="@+id/charttext"
+        />
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/lineChart"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_centerInParent="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/charttext"
+        android:layout_marginTop="8dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textColor="#ffffff"
+        android:text="温度报警"
+        app:layout_constraintTop_toBottomOf="@id/lineChart"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:id="@+id/templimittext"
+        />
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@id/templimittext"
+        app:layout_constraintBottom_toBottomOf="@id/templimittext"
+        app:layout_constraintTop_toTopOf="@id/templimittext"
+        android:id="@+id/stemplimit"
+        android:layout_marginStart="16dp"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="温度上限"
+        android:textSize="20sp"
+        android:textColor="#ffffff"
+        app:layout_constraintTop_toBottomOf="@id/templimittext"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:id="@+id/uplimittext"
+        />
+
+    <EditText
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textColor="#ffffff"
+        android:text="30"
+        app:layout_constraintTop_toTopOf="@id/uplimittext"
+        app:layout_constraintBottom_toBottomOf="@id/uplimittext"
+        app:layout_constraintLeft_toRightOf="@id/uplimittext"
+        app:layout_constraintRight_toLeftOf="@id/downlimittext"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:id="@+id/euplimit"
+        android:inputType="number"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+        android:textSize="20sp"
+        android:text="温度下限"
+        app:layout_constraintBottom_toBottomOf="@id/uplimittext"
+        app:layout_constraintTop_toTopOf="@id/uplimittext"
+        app:layout_constraintLeft_toRightOf="@id/euplimit"
+        app:layout_constraintRight_toLeftOf="@id/edownlimit"
+        android:id="@+id/downlimittext"
+        />
+
+    <EditText
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="20"
+        android:textColor="#ffffff"
+        android:textSize="20sp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/downlimittext"
+        app:layout_constraintBottom_toBottomOf="@id/downlimittext"
+        app:layout_constraintLeft_toRightOf="@id/downlimittext"
+        android:id="@+id/edownlimit"
+        android:inputType="number"
+        />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
