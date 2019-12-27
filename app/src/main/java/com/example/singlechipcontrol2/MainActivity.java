@@ -49,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
 
     int up = 30,down = 20;
 
+    int phonestate = 0;
+
     private DynamicLineChartManager dynamicLineChartManager1;
 
     @Override
@@ -96,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
                                 socket = new Socket("192.168.4.1",8086);//连接TCP服务器
                                 if (socket.isConnected()){//如果连接上TCP服务器
                                     Log.e("MainActivity", "isConnected");
+                                    phonestate = 0;
                                     Message msg = myHandler.obtainMessage();//从消息队列拉取个消息变量
                                     msg.what = 1;//设置消息变量的 what 变量值 为1
                                     myHandler.sendMessage(msg);//插入消息队列
@@ -123,13 +126,15 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 clearfocus();
                 if(isChecked){
-                        runflag = 2;
-                        log.setText("点亮LED灯");
-                        runble(2);
+                    phonestate = 2;
+                    runflag = 2;
+                    log.setText("打开报警电路");
+                    runble(2);
                 }else{
-                        runflag = 2;
-                        log.setText("熄灭LED灯");
-                        runble(2);
+                    phonestate = 7;
+                    runflag = 7;
+                    log.setText("关闭报警电路");
+                    runble(2);
                 }
             }
         });
@@ -139,13 +144,15 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 clearfocus();
                 if(isChecked){
-                        runflag = 3;
-                        log.setText("启动AD采样");
-                        runble(3);
+                    phonestate = 3;
+                    runflag = 3;
+                    log.setText("启动AD采样");
+                    runble(3);
                 }else{
-                        runflag = 4;
-                        log.setText("停止AD采样");
-                        runble(4);
+                    phonestate = 4;
+                    runflag = 4;
+                    log.setText("停止AD采样");
+                    runble(4);
                 }
             }
         });
@@ -187,10 +194,12 @@ public class MainActivity extends AppCompatActivity {
                     temp = (down - diff)*0.385 + restrictioncheck;
                     down = (int)(205000 * (temp/(1000+temp)-restrictioncheck/(restrictioncheck+1000)));
 
+                    phonestate = 5;
                     runflag = 5;
                     log.setText("温度报警已打开");
                     runble(5);
                 }else {
+                    phonestate = 6;
                     dynamicLineChartManager1.removeLimitLine();
                     runflag = 6;
                     log.setText("温度报警已关闭");
@@ -233,6 +242,9 @@ public class MainActivity extends AppCompatActivity {
                                 runflag = 1;
                             }else if (runflag == 6){
                                 runble(6);
+                                runflag = 1;
+                            }else if (runflag == 7){
+                                runble(7);
                                 runflag = 1;
                             }
                             byte[] Buffer = new byte[TcpReceiveDataLen];//创建一个新的数组
@@ -277,6 +289,12 @@ public class MainActivity extends AppCompatActivity {
                     String trd2 = trd.substring(1,2);
                     String trd3 = trd.substring(2,3);
                     String trd4 = trd.substring(3,4);
+
+                    int state = Integer.valueOf(trd.substring(4,5));
+                    if(phonestate != state){
+                        runflag = phonestate;
+                    }
+
                     int itrd1 = Integer.parseInt(trd1);
                     int itrd2 = Integer.parseInt(trd2);
                     int itrd3 = Integer.parseInt(trd3);
@@ -336,7 +354,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     try{
-                        String s = "TESTOK";
+                        String s = "TESTOPENOK";
                         byte[] TcpSendData2 = s.getBytes();
                         TcpSendDataLen = TcpSendData2.length;
                         TcpSendData = TcpSendData2;
@@ -429,6 +447,29 @@ public class MainActivity extends AppCompatActivity {
                 public void run() {
                     try{
                         String s = "UNLIMITOK";
+                        byte[] TcpSendData2 = s.getBytes();
+                        TcpSendDataLen = TcpSendData2.length;
+                        TcpSendData = TcpSendData2;
+
+                        if (socket!=null && socket.isConnected()){//如果TCP是正常连接的
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try{
+                                        outputStream.write(TcpSendData,0,TcpSendDataLen);//发送数据
+                                    }catch (Exception e){}
+                                }
+                            }).start();
+                        }
+                    }catch (Exception  e){}
+                }
+            }).start();
+        }else if (runflag == 7){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try{
+                        String s = "TESTCLOSEOK";
                         byte[] TcpSendData2 = s.getBytes();
                         TcpSendDataLen = TcpSendData2.length;
                         TcpSendData = TcpSendData2;
